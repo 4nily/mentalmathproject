@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mental Math App — Practice Mental Arithmetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grid-glow" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark">＋−×÷</span>
+    <span class="brand-name">Mental Math App</span>
+  </div>
+  <nav class="tabs" id="mainNav">
+    <button class="tab active" data-view="home">Home</button>
+    <button class="tab" data-view="practice">Practice</button>
+    <button class="tab" data-view="history">History</button>
+    <button class="tab" data-view="leaderboard">Leaderboard</button>
+    <button class="tab" data-view="resources">Resources</button>
+    <button class="tab" data-view="contact">Contact</button>
+  </nav>
+  <div class="profile-chip" id="profileChip" title="Click to change your name">
+    <span id="profileName">set a name</span>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- ============ HOME ============ -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <div class="hero-text">
+        <p class="eyebrow">Mental Math App</p>
+        <h1>Enhance mental math skills,<br>one practice set at a time.</h1>
+        <p class="hero-sub">Choose a level and a tier. Answer ten problems. See your time. Repeat.</p>
+        <button class="btn btn-primary" id="jumpToPractice">Choose a tier ↓</button>
+      </div>
+      <div class="hero-board" aria-hidden="true">
+        <div class="hero-line" id="heroTyping"></div>
+      </div>
+    </div>
+
+    <div class="section-heading">
+      <h2>Pick a tier</h2>
+      <p>Each grade band has four tiers. Numbers, operations, and pace expectations get harder as you move from Bronze to Platinum.</p>
+    </div>
+
+    <div id="bandList" class="band-list"></div>
+  </section>
+
+  <!-- ============ PRACTICE SETUP + RUN ============ -->
+  <section class="view" id="view-practice">
+
+    <div id="practiceSetup" class="setup-panel">
+      <h2>Start a set</h2>
+      <p class="muted">Choose a level below.</p>
+      <div id="setupBandList" class="band-list compact"></div>
+    </div>
+
+    <div id="practiceRun" class="practice-run hidden">
+      <div class="run-topbar">
+        <div class="run-info">
+          <span class="run-tier" id="runTierLabel">—</span>
+          <span class="run-count" id="runCount">Question 1 / 10</span>
+        </div>
+        <div class="run-timers">
+          <div class="timer-block">
+            <span class="timer-label">elapsed</span>
+            <span class="timer-value" id="elapsedTime">0.0s</span>
+          </div>
+          <div class="timer-block">
+            <span class="timer-label">avg / question</span>
+            <span class="timer-value" id="avgTime">—</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-small" id="quitRun">End set</button>
+      </div>
+
+      <div class="run-body">
+        <div class="question-card">
+          <div class="question-progress">
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <div class="question-expression" id="questionExpression">—</div>
+          <form id="answerForm" autocomplete="off">
+            <input type="text" inputmode="decimal" id="answerInput" placeholder="your answer" autocomplete="off">
+            <button type="submit" class="btn btn-primary">Enter ↵</button>
+          </form>
+          <div class="feedback" id="answerFeedback"></div>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-tabs">
+            <button class="side-tab active" data-panel="scratch">Scratch paper</button>
+            <button class="side-tab" data-panel="graph">Grapher</button>
+          </div>
+
+          <div class="side-panel-body" id="panel-scratch">
+            <div class="scratch-toggle">
+              <button class="mini-tab active" data-mode="type">Type</button>
+              <button class="mini-tab" data-mode="draw">Draw</button>
+              <button class="btn btn-ghost btn-tiny" id="clearScratch">clear</button>
+            </div>
+            <textarea id="scratchText" placeholder="work it out here..."></textarea>
+            <div id="scratchDrawWrap" class="hidden">
+              <div class="draw-toolbar">
+                <button type="button" class="swatch active" data-color="#eaf3ff" style="--sw:#eaf3ff" title="ink white"></button>
+                <button type="button" class="swatch" data-color="#ffb454" style="--sw:#ffb454" title="amber"></button>
+                <button type="button" class="swatch" data-color="#4da3ff" style="--sw:#4da3ff" title="electric blue"></button>
+                <button type="button" class="swatch" data-color="#ff7a90" style="--sw:#ff7a90" title="coral"></button>
+                <button type="button" class="btn btn-ghost btn-tiny" id="eraserBtn">eraser</button>
+              </div>
+              <canvas id="scratchCanvas" width="480" height="320"></canvas>
+            </div>
+          </div>
+
+          <div class="side-panel-body hidden" id="panel-graph">
+            <div class="graph-controls">
+              <input type="text" id="graphExpr" placeholder="e.g. sin(x) * 2 + 1" value="">
+              <button class="btn btn-primary btn-small" id="plotBtn">Plot</button>
+            </div>
+            <div class="graph-controls secondary">
+              <button class="btn btn-ghost btn-tiny" id="zoomIn">zoom in</button>
+              <button class="btn btn-ghost btn-tiny" id="zoomOut">zoom out</button>
+              <button class="btn btn-ghost btn-tiny" id="resetView">reset</button>
+              <button class="btn btn-ghost btn-tiny" id="clearPlots">clear</button>
+            </div>
+            <canvas id="graphCanvas" width="480" height="320"></canvas>
+            <p class="graph-hint">Functions: sin cos tan sqrt abs log exp, constants pi e, use ^ for powers.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div id="practiceResults" class="results-panel hidden"></div>
+
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section class="view" id="view-history">
+    <div class="section-heading">
+      <h2>History</h2>
+      <p>Nobody else can see your runs, and you can't see anyone else's.</p>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </section>
+
+  <!-- ============ LEADERBOARD ============ -->
+  <section class="view" id="view-leaderboard">
+    <div class="section-heading">
+      <h2>Leaderboard</h2>
+      <p>Demo WIP.</p>
+    </div>
+    <div class="lb-tier-select" id="lbTierSelect"></div>
+    <table class="lb-table">
+      <thead>
+        <tr><th>#</th><th>name</th><th>accuracy</th><th>avg time</th><th>score</th></tr>
+      </thead>
+      <tbody id="lbBody"></tbody>
+    </table>
+  </section>
+
+  <!-- ============ RESOURCES ============ -->
+  <section class="view" id="view-resources">
+    <div class="section-heading">
+      <h2>External Resources</h2>
+      <p>Extra material to learn math.</p>
+    </div>
+    <div class="resource-grid" id="resourceGrid"></div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="view" id="view-contact">
+    <div class="section-heading">
+      <h2>Questions, comments, concerns, bugs</h2>
+      <p>Found a wrong answer key, a level that's too easy, or just want to say hi? </p>
+    </div>
+
+    <div class="contact-grid">
+      <form id="contactForm" class="contact-form">
+        <label for="cName"> alias </label>
+        <input type="text" id="cName" required>
+        <label for="cEmail"> email (to provide a response back)</label>
+        <input type="email" id="cEmail" required>
+        <label for="cMsg">what's up</label>
+        <textarea id="cMsg" rows="6" required></textarea>
+        <button type="submit" class="btn btn-primary">Open in email →</button>
+      </form>
+
+      <div class="contact-links">
+        <a class="contact-link" href="mailto:hello@example.com" target="_blank" rel="noopener">
+          <span class="cl-label">Email</span>
+          <span class="cl-value">hello@example.com</span>
+        </a>
+        <a class="contact-link" href="https://github.com/yourusername/mental-math-app/issues" target="_blank" rel="noopener">
+          <span class="cl-label">GitHub Issues</span>
+          <span class="cl-value">report a bug or request a feature</span>
+        </a>
+        <a class="contact-link" href="https://github.com/4nily/mentalmathapp" target="_blank" rel="noopener">
+          <span class="cl-label">Source</span>
+          <span class="cl-value">found a bug or glitch in the system?</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p> (x^2 + y^2 - 1)^3 = x^2 * y^3 </p>
+</footer>
+
+<div class="name-modal hidden" id="nameModal">
+  <div class="name-modal-box">
+    <h3>What should we call you?</h3>
+    <p class="muted small">Used for your history and the leaderboard. Stored only in this browser.</p>
+    <input type="text" id="nameInput" placeholder="e.g. Sam" maxlength="20">
+    <div class="name-modal-actions">
+      <button class="btn btn-primary" id="saveNameBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="levels.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
